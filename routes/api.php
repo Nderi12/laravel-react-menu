@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\MenuController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -27,4 +28,9 @@ Route::group(['prefix' => 'auth'], function () {
 Route::group(['middleware' => 'auth:sanctum'], function() {
   Route::post('logout', [AuthController::class, 'logout']);
   Route::get('user', [AuthController::class, 'user']);
+
 });
+Route::get('/menus', [MenuController::class, 'index']);
+Route::post('/menus', [MenuController::class, 'store']);
+Route::put('/menus/{menu}', [MenuController::class, 'update']);
+Route::delete('/menus/{menu}', [MenuController::class, 'destroy']);

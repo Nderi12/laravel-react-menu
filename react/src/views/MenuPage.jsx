@@ -1,14 +1,15 @@
 // src/pages/MenuPage.jsx
-import React, { useState } from "react";
-import Sidebar from "../components/Sidebar";
+import React, { useEffect, useState } from "react";
 import MenuTree from "../components/MenuItems/MenuTree";
 import MenuDetails from "../components/MenuItems/MenuDetails";
-import { menuData as initialMenuData } from "../data/menuData"; // Import initial menu data
+import axiosClient from "../axios";
 
 const MenuPage = () => {
-  const [menuData, setMenuData] = useState(initialMenuData); // Central state for menu items
-  const [selectedMenu, setSelectedMenu] = useState(menuData[0]); // Initially select the first item
-  const [isExpanded, setIsExpanded] = useState(false); // State to manage the expand/collapse of the entire tree
+  const [menuData, setMenuData] = useState([]);
+  const [selectedMenu, setSelectedMenu] = useState(menuData[0]);
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   // Function to handle menu item selection
   const handleSelectMenu = (menu) => {
@@ -19,6 +20,23 @@ const MenuPage = () => {
   const handleExpandCollapseAll = (expand) => {
     setIsExpanded(expand);
   };
+
+  // Fetch the menu data when the component mounts
+  useEffect(() => {
+    axiosClient.get('/menus')
+      .then(response => {
+        setMenuData(response.data); // Set fetched menu data to state
+        setLoading(false); // Stop loading
+      })
+      .catch(error => {
+        setError('Error fetching menu data');
+        setLoading(false); // Stop loading
+      });
+  }, []);
+
+  // Render loading, error or the menu tree
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>{error}</div>;
 
   return (
     <div className="flex w-full h-screen">
