@@ -3,6 +3,7 @@ import { Navigate, Outlet } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
 import { menuData as initialMenuData } from "../data/menuData"; // Import initial menu data
 import { userStateContext } from "../contexts/ContextProvider";
+import TopNavBar from "./TopNavBar";
 
 export default function DefaultLayout() {
   const { currentUser, userToken } = userStateContext()
@@ -18,10 +19,15 @@ export default function DefaultLayout() {
     };
 
   return (
+    <>
+      <TopNavBar />
+      
       <div className="flex">
+
         <Sidebar menuData={menuData} onSelectMenu={handleSelectMenu} />
         
         <Outlet />
       </div>
+    </>
     );
 }
