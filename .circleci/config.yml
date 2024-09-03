@@ -5,7 +5,6 @@ orbs:
 
 jobs:
   build-node:
-    # Build the Node.js project
     executor: node/default
     steps:
       - checkout
@@ -17,7 +16,6 @@ jobs:
       - run:
           name: Create the ~/artifacts directory if it doesn't exist
           command: mkdir -p ~/artifacts
-      # Copy output to artifacts directory
       - run:
           name: Copy artifacts
           command: cp -R build dist public .output .next .docusaurus ~/artifacts 2>/dev/null || true
@@ -28,6 +26,10 @@ jobs:
   test-php:
     docker:
       - image: cimg/php:8.2-node
+      - image: circleci/mysql:5.7   # Add MySQL service
+        environment:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: laravel  # Set the name of your test database
     steps:
       - checkout
       - run:
@@ -38,20 +40,19 @@ jobs:
           command: |
             cp .env.example .env
             php artisan key:generate
-      - restore_cache:
-          keys:
-            - composer-v1-{{ checksum "composer.lock" }}
-      - save_cache:
-          paths:
-            - vendor
-          key: composer-v1-{{ checksum "composer.lock" }}
+            # Update .env with database connection details
+            sed -i 's/DB_HOST=127.0.0.1/DB_HOST=127.0.0.1/' .env
+            sed -i 's/DB_DATABASE=laravel/DB_DATABASE=laravel/' .env
+            sed -i 's/DB_USERNAME=root/DB_USERNAME=root/' .env
+            sed -i 's/DB_PASSWORD=/DB_PASSWORD=root/' .env
+      - run:
+          name: Migrate the database
+          command: php artisan migrate
       - run:
           name: Run PHP tests
           command: ./vendor/bin/phpunit
 
-
   deploy:
-    # Deploy job to aws ec2 instance
     docker:
       - image: cimg/base:stable
     steps:
