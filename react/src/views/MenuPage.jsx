@@ -34,6 +34,24 @@ const MenuPage = () => {
       });
   }, []);
 
+  const handleDeleteMenu = async (menuId) => {
+    const menuItem = menuData.find((item) => item.id === menuId);
+
+    if (menuItem && menuItem.children && menuItem.children.length > 0) {
+      alert("Cannot delete a menu item with children.")
+      return;
+    }
+
+    try {
+      await axiosClient.delete(`/menus/${menuId}`);
+      setMenuData(menuData.filter((item) => item.id !== menuId));
+      setSelectedMenu(null);
+    } catch (err) {
+      console.error("Error deleting menu item:", err);
+      alert("Failed to delete the menu item.");
+    }
+  }
+
   // Render loading, error or the menu tree
   if (loading) return <div>Loading...</div>;
   if (error) return <div>{error}</div>;
@@ -80,6 +98,7 @@ const MenuPage = () => {
                 )
               )
             }
+            onDeleteMenu={handleDeleteMenu}
           />
         ) : (
           <div className="text-center text-gray-500">

@@ -49,6 +49,13 @@ const MenuTree = ({ menuData, isExpanded, onSelectMenu }) => {
             >
               {item.name}
             </span>
+            <button
+              className="ml-2 text-blue-500 hover:text-blue-700"
+              onClick={() => onAddChild(item)}
+            >
+              {/* <PlusIcon className="h-4 w-4" /> */}
+              Add
+            </button>
           </div>
 
           {/* Render children if expanded and children exist */}

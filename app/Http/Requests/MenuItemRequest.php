@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class MenuItemRequest extends FormRequest
 {
@@ -21,10 +22,13 @@ class MenuItemRequest extends FormRequest
      */
     public function rules(): array
     {
+        $orderRule = $this->isMethod('post') ? 'required|integer' : 'nullable|integer';
+        $nameRule = $this->isMethod('post') ? 'required|string|max:255' : 'nullable|string|max:255';
+
         return [
-            'name' => 'required|string|max:255',
+            'name' => $nameRule,
             'parent_id' => 'nullable|exists:menu_items,id',
-            'order' => 'required|integer'
+            'order' => $orderRule,
         ];
     }
 }

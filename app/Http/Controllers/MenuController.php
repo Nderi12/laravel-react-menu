@@ -22,6 +22,20 @@ class MenuController extends Controller
     }
 
     /**
+     * Show the a specific menu item
+     *
+     * @param [type] $id
+     * @return void
+     * @author Nderi Kamau <nderikamau1212@gmail.com>
+     */
+    public function show($id)
+    {
+        $menuItem = MenuItem::where('id', $id)->first();
+
+        return response()->json($menuItem);
+    }
+
+    /**
      * Store a new menu item
      *
      * @param \Illuminate\Http\Request $request
@@ -45,11 +59,13 @@ class MenuController extends Controller
      * @return void
      * @author Nderi Kamau <nderikamau1212@gmail.com>
      */
-    public function update(MenuItemRequest $request, MenuItem $menuItem)
+    public function update(MenuItemRequest $request, $id)
     {
-        $request->validated();
+        $menuItem = MenuItem::where('id', $id)->first();
 
-        $menuItem->update($request->all());
+        $data = $request->validated();
+
+        $menuItem->update($data);
 
         return response()->json($menuItem);
     }
@@ -61,10 +77,20 @@ class MenuController extends Controller
      * @return void
      * @author Nderi Kamau <nderikamau1212@gmail.com>
      */
-    public function destroy(MenuItem $menuItem)
+    public function destroy($id)
     {
+        $menuItem = MenuItem::where('id', $id)->first();
+
+        if (!$menuItem) {
+            return response()->json(['error' => 'Menu item not found'], 404);
+        }
+
+        if ($menuItem->children()->exists()) {
+            return response()->json(['error' => 'Cannot delete menu item with children'], 400);
+        }
+
         $menuItem->delete();
         
-        return response()->json(null, 204);
+        return response()->json(null, 200);
     }
 }

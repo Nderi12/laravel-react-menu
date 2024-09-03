@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from "react";
+import axiosClient from "../../axios";
 
-const MenuDetails = ({ selectedMenu, onUpdateMenu }) => {
-  const [menuData, setMenuData] = useState(selectedMenu);
+const MenuDetails = ({ selectedMenu, onUpdateMenu, onDeleteMenu }) => {
+  const [menuData, setMenuData] = useState(selectedMenu || {});
+  const [isSaving, setIsSaving] = useState(false); // State to handle save button loading
 
+  // Update local state when the selected menu changes
   useEffect(() => {
-    setMenuData(selectedMenu); // Update local state when selected menu changes
+    setMenuData(selectedMenu);
   }, [selectedMenu]);
 
   const handleChange = (e) => {
@@ -13,30 +16,46 @@ const MenuDetails = ({ selectedMenu, onUpdateMenu }) => {
   };
 
   const handleSave = () => {
-    onUpdateMenu(menuData); // Pass updated data back to parent
+    setIsSaving(true); // Start saving
+
+    axiosClient
+      .put(`/menus/${menuData.id}`, menuData)
+      .then((response) => {
+        onUpdateMenu(response.data);
+      })
+      .catch((error) => {
+        console.error("Error updating menu:", error);
+      })
+      .finally(() => {
+        setIsSaving(false); // End saving
+      });
   };
 
-  const handleCancel = () => {
-    setMenuData(selectedMenu); // Reset to initial state
+  const handleDelete = () => {
+    if (window.confirm("Are you sure you want to delete this menu item?")) {
+      onDeleteMenu(menuData.id); // Call delete function from parent
+    }
   };
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-md">
-      <h2 className="text-xl font-semibold mb-4">Menu Details</h2>
+      <h2 className="text-xl font-semibold mb-4">{menuData.name} Details</h2>
       <form>
-        {/* Form fields */}
+        {/* Menu ID Field */}
         <div className="mb-4">
           <label className="block text-gray-700 text-sm font-bold mb-2">
             Menu ID
           </label>
           <input
-            name="menuId"
+            name="uuid"
             type="text"
             className="w-full p-2 border border-gray-300 rounded"
-            value={menuData.menuId || ""}
+            value={menuData.uuid || ""}
             readOnly
           />
         </div>
+
+        {/* Depth Field */}
         <div className="mb-4">
           <label className="block text-gray-700 text-sm font-bold mb-2">
             Depth
@@ -45,22 +64,26 @@ const MenuDetails = ({ selectedMenu, onUpdateMenu }) => {
             name="depth"
             type="text"
             className="w-full p-2 border border-gray-300 rounded"
-            value={menuData.depth || ""}
+            value={menuData.order || ""}
             readOnly
           />
         </div>
+
+        {/* Parent Data Field */}
         <div className="mb-4">
           <label className="block text-gray-700 text-sm font-bold mb-2">
             Parent Data
           </label>
           <input
-            name="parentData"
+            name="parent_id"
             type="text"
             className="w-full p-2 border border-gray-300 rounded"
-            value={menuData.parentData || ""}
+            value={menuData.parent_id || ""}
             onChange={handleChange}
           />
         </div>
+
+        {/* Name Field */}
         <div className="mb-4">
           <label className="block text-gray-700 text-sm font-bold mb-2">
             Name
@@ -73,20 +96,23 @@ const MenuDetails = ({ selectedMenu, onUpdateMenu }) => {
             onChange={handleChange}
           />
         </div>
-        <div className="flex justify-end">
+
+        {/* Save and Cancel Buttons */}
+        <div className="flex justify-center">
           <button
             type="button"
-            className="bg-blue-500 text-white px-4 py-2 rounded mr-2"
+            className={`bg-blue-500 text-white px-4 py-2 rounded mr-2 ${isSaving ? "opacity-50 cursor-not-allowed" : ""}`}
             onClick={handleSave}
+            disabled={isSaving} // Disable button while saving
           >
-            Save
+            {isSaving ? "Saving..." : "Save"}
           </button>
           <button
             type="button"
-            className="bg-gray-300 text-gray-700 px-4 py-2 rounded"
-            onClick={handleCancel}
+            className="bg-red-500 text-white px-4 py-2 rounded"
+            onClick={handleDelete}
           >
-            Cancel
+            Delete
           </button>
         </div>
       </form>

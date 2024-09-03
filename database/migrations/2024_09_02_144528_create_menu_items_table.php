@@ -13,8 +13,9 @@ return new class extends Migration
     {
         Schema::create('menu_items', function (Blueprint $table) {
             $table->id();
+            $table->uuid('uuid')->unique();
             $table->string('name');
-            $table->unsignedBigInteger('parent_id')->nullable(); // For hierarchical structure
+            $table->unsignedBigInteger('parent_id')->nullable();
             $table->integer('order')->default(0);
             $table->timestamps();
             
