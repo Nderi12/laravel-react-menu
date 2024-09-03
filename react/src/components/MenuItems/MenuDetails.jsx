@@ -2,14 +2,26 @@ import React, { useState, useEffect } from "react";
 import axiosClient from "../../axios";
 
 const MenuDetails = ({ selectedMenu, onUpdateMenu, onDeleteMenu }) => {
-  const [menuData, setMenuData] = useState(selectedMenu || {});
+  const [menuData, setMenuData] = useState({});
   const [isSaving, setIsSaving] = useState(false);
 
   const isNewMenu = !menuData.id;
 
   // Update local state when the selected menu changes
   useEffect(() => {
-    setMenuData(selectedMenu);
+    if (selectedMenu && selectedMenu.id) {
+      axiosClient
+        .get(`/menus/${selectedMenu.id}`)
+        .then((response) => {
+          setMenuData(response.data);
+        })
+        .catch((error) => {
+          console.error("Error fetching menu data", error);
+        });
+    } else {
+      // Reset form when adding a new menu item
+      setMenuData({ parent_id: selectedMenu?.parent_id || null });
+    }
   }, [selectedMenu]);
 
   const handleChange = (e) => {
@@ -24,8 +36,10 @@ const MenuDetails = ({ selectedMenu, onUpdateMenu, onDeleteMenu }) => {
       ? axiosClient.post("/menus", menuData) // Create a new menu item
       : axiosClient.put(`/menus/${menuData.id}`, menuData); // Update existing menu item
 
-    request.then((response) => {
+    request
+      .then((response) => {
         onUpdateMenu(response.data);
+        window.location.reload()
       })
       .catch((error) => {
         console.error("Error updating menu:", error);
@@ -43,7 +57,9 @@ const MenuDetails = ({ selectedMenu, onUpdateMenu, onDeleteMenu }) => {
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-md">
-      <h2 className="text-xl font-semibold mb-4">{menuData.name} Details</h2>
+      <h2 className="text-xl font-semibold mb-4">
+        {isNewMenu ? "New Menu" : `${menuData.name} Details`}
+      </h2>
       <form onSubmit={handleSave}>
         {/* Menu ID Field */}
         {!isNewMenu && (
@@ -61,7 +77,7 @@ const MenuDetails = ({ selectedMenu, onUpdateMenu, onDeleteMenu }) => {
           </div>
         )}
 
-      {/* Depth Field */}
+        {/* Depth Field */}
         {!isNewMenu && (
           <div className="mb-4">
             <label className="block text-gray-700 text-sm font-bold mb-2">
@@ -71,25 +87,43 @@ const MenuDetails = ({ selectedMenu, onUpdateMenu, onDeleteMenu }) => {
               name="depth"
               type="text"
               className="w-full p-2 border border-gray-300 rounded"
-              value={menuData.order || ""}
+              value={menuData.order || "0"}
               readOnly
             />
           </div>
         )}
 
+        {/* Parent ID Field */}
+        {isNewMenu && (
+          <div className="mb-4">
+            <label className="block text-gray-700 text-sm font-bold mb-2">
+              Parent Data
+            </label>
+            <input
+              name="parent_id"
+              type="text"
+              className="w-full p-2 border border-gray-300 rounded"
+              value={menuData.parent_id || ""}
+              onChange={handleChange}
+            />
+          </div>
+        )}
+
         {/* Parent Data Field */}
-        <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2">
-            Parent Data
-          </label>
-          <input
-            name="parent_id"
-            type="text"
-            className="w-full p-2 border border-gray-300 rounded"
-            value={menuData.parent_id || ""}
-            onChange={handleChange}
-          />
-        </div>
+        {!isNewMenu && (
+          <div className="mb-4">
+            <label className="block text-gray-700 text-sm font-bold mb-2">
+              Parent Name
+            </label>
+            <input
+              name="name"
+              type="text"
+              className="w-full p-2 border border-gray-300 rounded"
+              value={menuData.parent ? menuData.parent.name : "No Parent"}
+              onChange={handleChange}
+            />
+          </div>
+        )}
 
         {/* Name Field */}
         <div className="mb-4">
@@ -109,19 +143,23 @@ const MenuDetails = ({ selectedMenu, onUpdateMenu, onDeleteMenu }) => {
         <div className="flex justify-center">
           <button
             type="submit"
-            className={`bg-blue-500 text-white px-4 py-2 rounded mr-2 ${isSaving ? "opacity-50 cursor-not-allowed" : ""}`}
+            className={`bg-blue-500 text-white px-4 py-2 rounded mr-2 ${
+              isSaving ? "opacity-50 cursor-not-allowed" : ""
+            }`}
             onClick={handleSave}
             disabled={isSaving} // Disable button while saving
           >
             {isSaving ? "Saving..." : "Save"}
           </button>
-          <button
-            type="submit"
-            className="bg-red-500 text-white px-4 py-2 rounded"
-            onClick={handleDelete}
-          >
-            Delete
-          </button>
+          {!isNewMenu && (
+            <button
+              type="submit"
+              className="bg-red-500 text-white px-4 py-2 rounded"
+              onClick={handleDelete}
+            >
+              Delete
+            </button>
+          )}
         </div>
       </form>
     </div>

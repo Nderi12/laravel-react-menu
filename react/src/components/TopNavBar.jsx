@@ -1,15 +1,22 @@
 import React, { useState } from "react";
+import axiosClient from "../axios";
+import { userStateContext } from "../contexts/ContextProvider";
 
 export default function TopNavBar() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const { setUserToken } = userStateContext()
 
   const handleDropdownToggle = () => {
     setIsDropdownOpen(!isDropdownOpen);
   };
 
-  const handleSignOut = () => {
-    // Add sign-out logic here
-    console.log("Signing out...");
+  const handleSignOut = (event) => {
+    event.preventDefault();
+    
+    axiosClient.post('/logout')
+      .then(res => {
+        setUserToken(null)
+      });
   };
 
   return (
@@ -25,7 +32,7 @@ export default function TopNavBar() {
           className="flex items-center focus:outline-none"
         >
           {/* <UserIcon> */}
-          <span className="text-gray-700 font-medium">John Doe</span>
+          <span className="text-gray-700 font-medium">User</span>
         </button>
 
         {/* Dropdown Menu */}

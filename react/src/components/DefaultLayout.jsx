@@ -30,10 +30,6 @@ export default function DefaultLayout() {
       });
   }, []);
 
-  const handleSelectMenu = (menu) => {
-      setSelectedMenu(menu);
-    };
-
   // Render loading state or error message
   if (loading) return <div className="fixed inset-0 flex items-center justify-center z-50">Loading...</div>;
   if (error) return <div>{error}</div>;
