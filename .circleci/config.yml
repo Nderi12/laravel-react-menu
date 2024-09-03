@@ -72,7 +72,7 @@ jobs:
               sudo npm install
               sudo npm run build
               sudo rm -rf node_modules
-              sudo systemctl restart php-fpm
+              sudo systemctl restart php8.2-fpm
               sudo systemctl restart nginx
             "
 
