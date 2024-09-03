@@ -65,12 +65,12 @@ jobs:
               cd /var/www/vhosts/laravel-react-menu/
               git pull origin main
               composer install --no-interaction --prefer-dist --optimize-autoloader
-              php artisan migrate --force
-              php artisan cache:clear
-              php artisan config:cache
-              cd /react
-              npm install
-              npm run build
+              sudo php artisan migrate --force
+              sudo php artisan cache:clear
+              sudo php artisan config:cache
+              cd /var/www/vhosts/laravel-react-menu/react
+              sudo npm install
+              sudo npm run build
               sudo rm -rf node_modules
               sudo systemctl restart php-fpm
               sudo systemctl restart nginx
