@@ -11,6 +11,7 @@ jobs:
       - checkout
       - node/install-packages:
           pkg-manager: npm
+          args: --legacy-peer-deps # To handle potential dependency conflicts
       - run:
           command: npm run build
       - run:
@@ -48,7 +49,6 @@ jobs:
           name: Run PHP tests
           command: ./vendor/bin/phpunit
 
-
   deploy:
     # Deploy job to aws ec2 instance
     docker:
@@ -61,14 +61,16 @@ jobs:
           name: Deploy to AWS EC2 Instance
           command: |
             ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa $EC2_USERNAME@$EC2_IP "
-              cd /var/www/vhosts/project_health_tracker/
+              cd /var/www/vhosts/laravel-react-menu/
               git pull origin main
               composer install --no-interaction --prefer-dist --optimize-autoloader
-              npm install
-              npm run build
               php artisan migrate --force
               php artisan cache:clear
               php artisan config:cache
+              cd /react
+              npm install
+              npm run build
+              sudo rm -rf node_modules
               sudo systemctl restart php-fpm
               sudo systemctl restart nginx
             "
