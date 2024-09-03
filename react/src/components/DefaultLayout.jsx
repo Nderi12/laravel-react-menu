@@ -35,18 +35,19 @@ export default function DefaultLayout() {
     };
 
   // Render loading state or error message
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <div className="fixed inset-0 flex items-center justify-center z-50">Loading...</div>;
   if (error) return <div>{error}</div>;
 
   return (
     <>
-      <TopNavBar />
-      
-      <div className="flex">
-
-        <Sidebar menuData={menuData} onSelectMenu={handleSelectMenu} />
-        
-        <Outlet />
+      <div className="flex flex-col h-screen">
+        <TopNavBar />
+        <div className="flex flex-1">
+          <Sidebar />
+          <main className="flex-1 ml-64 p-4 overflow-auto">
+            <Outlet />
+          </main>
+        </div>
       </div>
     </>
     );
