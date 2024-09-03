@@ -9,8 +9,9 @@ jobs:
     executor: node/default
     steps:
       - checkout
-      - node/install-packages:
-          pkg-manager: npm
+      - run:
+          name: Install npm dependencies
+          command: npm install --legacy-peer-deps
       - run:
           command: npm run build
       - run:
