@@ -1,38 +1,70 @@
 // src/pages/MenuPage.jsx
 import React, { useEffect, useState } from "react";
-import MenuTree from "../components/MenuItems/MenuTree";
 import MenuDetails from "../components/MenuItems/MenuDetails";
 import axiosClient from "../axios";
+import MenuTree from "../components/MenuItems/MenuTree";
 
 const MenuPage = () => {
   const [menuData, setMenuData] = useState([]);
-  const [selectedMenu, setSelectedMenu] = useState(menuData[0]);
+  const [selectedMenu, setSelectedMenu] = useState(null);
   const [isExpanded, setIsExpanded] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isAddingChild, setIsAddingChild] = useState(false); // State to handle adding mode
 
-  // Function to handle menu item selection
+  useEffect(() => {
+    axiosClient
+      .get("/menus")
+      .then((response) => {
+        setMenuData(response.data);
+        setLoading(false);
+      })
+      .catch((error) => {
+        setError("Error fetching menu data");
+        setLoading(false);
+      });
+  }, []);
+
   const handleSelectMenu = (menu) => {
     setSelectedMenu(menu);
+    setIsAddingChild(false); // Reset adding mode
   };
 
-  // Function to handle expand/collapse all
+  const handleAddChild = (parentMenu) => {
+    setSelectedMenu({ parent_id: parentMenu.id }); // Set selected menu for new child
+    setIsAddingChild(true); // Enter adding mode
+  };
+
   const handleExpandCollapseAll = (expand) => {
     setIsExpanded(expand);
   };
 
-  // Fetch the menu data when the component mounts
-  useEffect(() => {
-    axiosClient.get('/menus')
-      .then(response => {
-        setMenuData(response.data); // Set fetched menu data to state
-        setLoading(false); // Stop loading
-      })
-      .catch(error => {
-        setError('Error fetching menu data');
-        setLoading(false); // Stop loading
+  const handleSaveMenu = (menu) => {
+    if (isAddingChild) {
+      // Handle creation of new child menu
+      axiosClient.post("/menus", menu).then((response) => {
+        // Add new child to the menu data
+        const updatedMenuData = menuData.map((item) =>
+          item.id === menu.parent_id
+            ? { ...item, children: [...(item.children || []), response.data] }
+            : item
+        );
+        setMenuData(updatedMenuData);
+        setIsAddingChild(false); // Reset adding mode
+        setSelectedMenu(null); // Deselect the menu
       });
-  }, []);
+    } else {
+      // Handle update of existing menu
+      axiosClient.put(`/menus/${menu.id}`, menu).then((response) => {
+        setMenuData(
+          menuData.map((item) =>
+            item.id === response.data.id ? response.data : item
+          )
+        );
+        setSelectedMenu(response.data);
+      });
+    }
+  };
 
   const handleDeleteMenu = async (menuId) => {
     const menuItem = menuData.find((item) => item.id === menuId);
@@ -52,13 +84,12 @@ const MenuPage = () => {
     }
   }
 
-  // Render loading, error or the menu tree
   if (loading) return <div>Loading...</div>;
   if (error) return <div>{error}</div>;
 
   return (
     <div className="flex w-full h-screen">
-      {/* Menu Details Form Section */}
+      {/* Menu Tree Section */}
       <div className="w-2/3 bg-white p-6 overflow-auto">
         <div className="w-full bg-gray-100 p-4">
           {/* Expand/Collapse Buttons */}
@@ -82,6 +113,7 @@ const MenuPage = () => {
             menuData={menuData}
             isExpanded={isExpanded}
             onSelectMenu={handleSelectMenu}
+            onAddChild={handleAddChild}
           />
         </div>
       </div>

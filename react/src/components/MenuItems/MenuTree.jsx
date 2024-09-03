@@ -1,15 +1,14 @@
 // src/components/MenuTree.jsx
 import React, { useState, useEffect } from "react";
+// import { PlusIcon } from "@heroicons/react/outline"; // Using Heroicons for the Add button
 
-const MenuTree = ({ menuData, isExpanded, onSelectMenu }) => {
-  const [expandedItems, setExpandedItems] = useState({}); // State for each item's expanded state
+const MenuTree = ({ menuData, isExpanded, onSelectMenu, onAddChild }) => {
+  const [expandedItems, setExpandedItems] = useState({});
 
   useEffect(() => {
-    // Update all items' expand state when the global expand/collapse state changes
     const newExpandedState = {};
     menuData.forEach((item) => {
       newExpandedState[item.id] = isExpanded;
-      // Check if the item has children and update their expand state
       if (item.children && item.children.length > 0) {
         item.children.forEach((child) => {
           newExpandedState[child.id] = isExpanded;
@@ -31,24 +30,20 @@ const MenuTree = ({ menuData, isExpanded, onSelectMenu }) => {
       {menuData.map((item) => (
         <div key={item.id} className="ml-4">
           {/* Toggle button and item name */}
-          <div
-            className="flex items-center cursor-pointer py-1"
-            onClick={() => handleToggle(item.id)}
-          >
+          <div className="flex items-center cursor-pointer py-1">
             {/* Toggle icon */}
-            <span className="mr-2">
+            <span className="mr-2" onClick={() => handleToggle(item.id)}>
               {item.children && item.children.length > 0
                 ? expandedItems[item.id]
                   ? "▼"
                   : "►"
                 : ""}
             </span>
-            <span
-              className="text-gray-800"
-              onClick={() => onSelectMenu(item)}
-            >
+            {/* Item name */}
+            <span className="text-gray-800" onClick={() => onSelectMenu(item)}>
               {item.name}
             </span>
+            {/* Add button */}
             <button
               className="ml-2 text-blue-500 hover:text-blue-700"
               onClick={() => onAddChild(item)}
@@ -64,6 +59,7 @@ const MenuTree = ({ menuData, isExpanded, onSelectMenu }) => {
               menuData={item.children}
               isExpanded={isExpanded}
               onSelectMenu={onSelectMenu}
+              onAddChild={onAddChild} // Pass the handler down
             />
           )}
         </div>

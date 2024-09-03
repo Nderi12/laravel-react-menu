@@ -3,7 +3,9 @@ import axiosClient from "../../axios";
 
 const MenuDetails = ({ selectedMenu, onUpdateMenu, onDeleteMenu }) => {
   const [menuData, setMenuData] = useState(selectedMenu || {});
-  const [isSaving, setIsSaving] = useState(false); // State to handle save button loading
+  const [isSaving, setIsSaving] = useState(false);
+
+  const isNewMenu = !menuData.id;
 
   // Update local state when the selected menu changes
   useEffect(() => {
@@ -18,9 +20,11 @@ const MenuDetails = ({ selectedMenu, onUpdateMenu, onDeleteMenu }) => {
   const handleSave = () => {
     setIsSaving(true); // Start saving
 
-    axiosClient
-      .put(`/menus/${menuData.id}`, menuData)
-      .then((response) => {
+    const request = isNewMenu
+      ? axiosClient.post("/menus", menuData) // Create a new menu item
+      : axiosClient.put(`/menus/${menuData.id}`, menuData); // Update existing menu item
+
+    request.then((response) => {
         onUpdateMenu(response.data);
       })
       .catch((error) => {
@@ -40,34 +44,38 @@ const MenuDetails = ({ selectedMenu, onUpdateMenu, onDeleteMenu }) => {
   return (
     <div className="bg-white p-6 rounded-lg shadow-md">
       <h2 className="text-xl font-semibold mb-4">{menuData.name} Details</h2>
-      <form>
+      <form onSubmit={handleSave}>
         {/* Menu ID Field */}
-        <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2">
-            Menu ID
-          </label>
-          <input
-            name="uuid"
-            type="text"
-            className="w-full p-2 border border-gray-300 rounded"
-            value={menuData.uuid || ""}
-            readOnly
-          />
-        </div>
+        {!isNewMenu && (
+          <div className="mb-4">
+            <label className="block text-gray-700 text-sm font-bold mb-2">
+              Menu ID
+            </label>
+            <input
+              name="uuid"
+              type="text"
+              className="w-full p-2 border border-gray-300 rounded"
+              value={menuData.uuid || ""}
+              readOnly
+            />
+          </div>
+        )}
 
-        {/* Depth Field */}
-        <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2">
-            Depth
-          </label>
-          <input
-            name="depth"
-            type="text"
-            className="w-full p-2 border border-gray-300 rounded"
-            value={menuData.order || ""}
-            readOnly
-          />
-        </div>
+      {/* Depth Field */}
+        {!isNewMenu && (
+          <div className="mb-4">
+            <label className="block text-gray-700 text-sm font-bold mb-2">
+              Depth
+            </label>
+            <input
+              name="depth"
+              type="text"
+              className="w-full p-2 border border-gray-300 rounded"
+              value={menuData.order || ""}
+              readOnly
+            />
+          </div>
+        )}
 
         {/* Parent Data Field */}
         <div className="mb-4">
@@ -100,7 +108,7 @@ const MenuDetails = ({ selectedMenu, onUpdateMenu, onDeleteMenu }) => {
         {/* Save and Cancel Buttons */}
         <div className="flex justify-center">
           <button
-            type="button"
+            type="submit"
             className={`bg-blue-500 text-white px-4 py-2 rounded mr-2 ${isSaving ? "opacity-50 cursor-not-allowed" : ""}`}
             onClick={handleSave}
             disabled={isSaving} // Disable button while saving
@@ -108,7 +116,7 @@ const MenuDetails = ({ selectedMenu, onUpdateMenu, onDeleteMenu }) => {
             {isSaving ? "Saving..." : "Save"}
           </button>
           <button
-            type="button"
+            type="submit"
             className="bg-red-500 text-white px-4 py-2 rounded"
             onClick={handleDelete}
           >

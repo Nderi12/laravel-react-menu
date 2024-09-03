@@ -44,9 +44,25 @@ class MenuController extends Controller
      */
     public function store(MenuItemRequest $request)
     {
-        $request->validated();
+        $data = $request->validated();
 
-        $menuItem = MenuItem::create($request->all());
+        // Determine the order of the new item
+        if (isset($data['parent_id'])) {
+            // Get the maximum order value of the existing children
+            $maxOrder = MenuItem::where('parent_id', $data['parent_id'])->max('order');
+            $data['order'] = $maxOrder !== null ? $maxOrder + 1 : 1; // Increment max order or set to 1
+        } else {
+            // Root level item, find max order at root level
+            $maxOrder = MenuItem::whereNull('parent_id')->max('order');
+            $data['order'] = $maxOrder !== null ? $maxOrder + 1 : 1;
+        }
+
+        // Set depth based on parent depth if any
+        $data['depth'] = isset($data['parent_id'])
+            ? MenuItem::find($data['parent_id'])->depth + 1
+            : 0;
+
+        $menuItem = MenuItem::create($data);
 
         return response()->json($menuItem, 201);
     }
@@ -64,6 +80,19 @@ class MenuController extends Controller
         $menuItem = MenuItem::where('id', $id)->first();
 
         $data = $request->validated();
+
+        // Recalculate order if parent_id has changed
+        if (isset($data['parent_id']) && $data['parent_id'] !== $menuItem->parent_id) {
+            $maxOrder = MenuItem::where('parent_id', $data['parent_id'])->max('order');
+            $data['order'] = $maxOrder !== null ? $maxOrder + 1 : 1;
+        }
+
+        // Recalculate depth if parent_id has changed
+        if (isset($data['parent_id'])) {
+            $data['depth'] = MenuItem::find($data['parent_id'])->depth + 1;
+        } else {
+            $data['depth'] = 0;
+        }
 
         $menuItem->update($data);
 
@@ -90,7 +119,7 @@ class MenuController extends Controller
         }
 
         $menuItem->delete();
-        
+
         return response()->json(null, 200);
     }
 }
