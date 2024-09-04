@@ -29,6 +29,8 @@ jobs:
     docker:
       - image: cimg/php:8.2-node
       - image: mysql:8.0
+    services:
+      - mysql
     steps:
       - checkout
       - run:
@@ -41,15 +43,24 @@ jobs:
             php artisan key:generate
             # Set up MySQL environment variables
             echo "DB_CONNECTION=mysql" >> .env
-            echo "DB_HOST=mysql" >> .env
+            echo "DB_HOST=127.0.0.1" >> .env
             echo "DB_PORT=3306" >> .env
             echo "DB_DATABASE=homestead" >> .env
             echo "DB_USERNAME=root" >> .env
             echo "DB_PASSWORD=" >> .env
       - run:
-          name: Start MySQL service
+          name: Wait for MySQL to be ready
           command: |
-            service mysql start
+            for i in $(seq 1 30); do
+              if mysqladmin ping -h127.0.0.1 --silent; then
+                break
+              fi
+              echo "Waiting for MySQL..."
+              sleep 1
+            done
+      - run:
+          name: Initialize MySQL Database
+          command: |
             mysql -e "CREATE DATABASE IF NOT EXISTS homestead;"
       - restore_cache:
           keys:
