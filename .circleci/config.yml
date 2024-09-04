@@ -28,7 +28,10 @@ jobs:
   test-php:
     docker:
       - image: cimg/php:8.2-node
-      - image: circleci/mysql:5.7
+      - image: circleci/mysql:5.7   # Add MySQL service
+        environment:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: laravel  # Set the name of your test database
     steps:
       - checkout
       - run:
@@ -44,16 +47,6 @@ jobs:
             sed -i 's/DB_DATABASE=laravel/DB_DATABASE=laravel/' .env
             sed -i 's/DB_USERNAME=root/DB_USERNAME=root/' .env
             sed -i 's/DB_PASSWORD=/DB_PASSWORD=root/' .env
-      - run:
-          name: Wait for MySQL to be ready
-          command: |
-            for i in $(seq 1 30); do
-              if mysqladmin ping -h127.0.0.1 --silent; then
-                break
-              fi
-              echo "Waiting for MySQL..."
-              sleep 1
-            done
       - run:
           name: Migrate the database
           command: php artisan migrate
