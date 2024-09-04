@@ -89,12 +89,6 @@ jobs:
               sudo php artisan migrate --force
               sudo php artisan cache:clear
               sudo php artisan config:cache
-              cd /var/www/vhosts/laravel-react-menu/react
-              sudo npm install
-              sudo npm run build
-              sudo rm -rf node_modules
-              sudo systemctl restart php8.2-fpm
-              sudo systemctl restart nginx
             "
 
 workflows:
