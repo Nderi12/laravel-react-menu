@@ -28,12 +28,7 @@ jobs:
   test-php:
     docker:
       - image: cimg/php:8.2-node
-    services:
-      - mysql:
-          image: circleci/mysql:5.7
-          environment:
-            MYSQL_ROOT_PASSWORD: root
-            MYSQL_DATABASE: laravel
+      - image: circleci/mysql:5.7
     steps:
       - checkout
       - run:
@@ -65,7 +60,6 @@ jobs:
       - run:
           name: Run PHP tests
           command: ./vendor/bin/phpunit
-
 
   deploy:
     # Deploy job to aws ec2 instance
