@@ -35,6 +35,9 @@ jobs:
     steps:
       - checkout
       - run:
+          name: Install MySQL Client
+          command: sudo apt-get update && sudo apt-get install -y mysql-client
+      - run:
           name: Install composer dependencies
           command: composer install --no-interaction --prefer-dist --no-scripts --no-progress --no-suggest
       - run:
@@ -66,6 +69,7 @@ jobs:
       - run:
           name: Run PHP tests
           command: ./vendor/bin/phpunit
+
 
   deploy:
     # Deploy job to aws ec2 instance
