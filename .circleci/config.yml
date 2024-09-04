@@ -28,6 +28,7 @@ jobs:
   test-php:
     docker:
       - image: cimg/php:8.2-node
+      - image: mysql:8.0
     steps:
       - checkout
       - run:
@@ -38,6 +39,18 @@ jobs:
           command: |
             cp .env.example .env
             php artisan key:generate
+            # Set up MySQL environment variables
+            echo "DB_CONNECTION=mysql" >> .env
+            echo "DB_HOST=mysql" >> .env
+            echo "DB_PORT=3306" >> .env
+            echo "DB_DATABASE=homestead" >> .env
+            echo "DB_USERNAME=root" >> .env
+            echo "DB_PASSWORD=" >> .env
+      - run:
+          name: Start MySQL service
+          command: |
+            service mysql start
+            mysql -e "CREATE DATABASE IF NOT EXISTS homestead;"
       - restore_cache:
           keys:
             - composer-v1-{{ checksum "composer.lock" }}
@@ -48,7 +61,6 @@ jobs:
       - run:
           name: Run PHP tests
           command: ./vendor/bin/phpunit
-
 
   deploy:
     # Deploy job to aws ec2 instance
@@ -68,12 +80,6 @@ jobs:
               sudo php artisan migrate --force
               sudo php artisan cache:clear
               sudo php artisan config:cache
-              cd /var/www/vhosts/laravel-react-menu/react
-              sudo npm install
-              sudo npm run build
-              sudo rm -rf node_modules
-              sudo systemctl restart php8.2-fpm
-              sudo systemctl restart nginx
             "
 
 workflows:
