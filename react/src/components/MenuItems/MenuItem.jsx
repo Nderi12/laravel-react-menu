@@ -1,8 +1,12 @@
-// src/components/MenuItem.jsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { FolderIcon } from '@heroicons/react/24/solid';
 
-export default function MenuItem ({ title, children }) {
-  const [isOpen, setIsOpen] = useState(false);
+export default function MenuItem({ title, children, defaultOpen }) {
+  const [isOpen, setIsOpen] = useState(defaultOpen);
+
+  useEffect(() => {
+    setIsOpen(defaultOpen);
+  }, [defaultOpen]);
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
@@ -11,15 +15,13 @@ export default function MenuItem ({ title, children }) {
   return (
     <div>
       <div
-        className="flex items-center justify-between p-2 text-gray-300 hover:text-white cursor-pointer"
+        className="flex items-center p-2 text-gray-300 hover:text-white cursor-pointer"
         onClick={toggleMenu}
       >
-        <span>{title}</span>
-        {/* Icon to indicate collapse/expand state */}
-        <span>{isOpen ? "▼" : "►"}</span>
+        <FolderIcon className="w-6" /><span className="ml-2">{title}</span>
       </div>
       {/* Submenu */}
       {isOpen && <div className="pl-4">{children}</div>}
     </div>
   );
-};
+}

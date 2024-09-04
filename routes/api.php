@@ -31,6 +31,7 @@ Route::group(['middleware' => 'auth:sanctum'], function() {
 
 });
 Route::get('/menus', [MenuController::class, 'index']);
+Route::get('/menus/{id}', [MenuController::class, 'show']);
 Route::post('/menus', [MenuController::class, 'store']);
 Route::put('/menus/{menu}', [MenuController::class, 'update']);
 Route::delete('/menus/{menu}', [MenuController::class, 'destroy']);

@@ -16,7 +16,7 @@ class MenuController extends Controller
      */
     public function index()
     {
-        $menuItems = MenuItem::with('children')->whereNull('parent_id')->get();
+        $menuItems = MenuItem::with(['parent', 'children.parent'])->whereNull('parent_id')->get();
 
         return response()->json($menuItems);
     }
@@ -30,7 +30,7 @@ class MenuController extends Controller
      */
     public function show($id)
     {
-        $menuItem = MenuItem::where('id', $id)->first();
+        $menuItem = MenuItem::where('id', $id)->with('parent')->first();
 
         return response()->json($menuItem);
     }
