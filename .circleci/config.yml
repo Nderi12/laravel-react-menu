@@ -4,28 +4,9 @@ orbs:
   php: circleci/php@1
 
 jobs:
-  build-node:
-    executor: node/default
-    steps:
-      - checkout
-      - run:
-          name: Install npm dependencies
-          command: npm install --legacy-peer-deps
-      - run:
-          command: npm run build
-      - run:
-          name: Create the ~/artifacts directory if it doesn't exist
-          command: mkdir -p ~/artifacts
-      - run:
-          name: Copy artifacts
-          command: cp -R build dist public .output .next .docusaurus ~/artifacts 2>/dev/null || true
-      - store_artifacts:
-          path: ~/artifacts
-          destination: node-build
-
   test-php:
     docker:
-      - image: cimg/php:8.2-node
+      - image: circleci/php:8.2-cli
       - image: circleci/mysql:5.7
         environment:
           MYSQL_ROOT_PASSWORD: root
@@ -34,7 +15,8 @@ jobs:
       - checkout
       - run:
           name: Install MySQL Client
-          command: apt-get update && apt-get install -y mysql-client
+          command: |
+            sudo apt-get update && sudo apt-get install -y mysql-client
       - run:
           name: Install composer dependencies
           command: composer install --no-interaction --prefer-dist --no-scripts --no-progress --no-suggest
@@ -63,25 +45,6 @@ jobs:
       - run:
           name: Run PHP tests
           command: ./vendor/bin/phpunit
-
-  deploy:
-    docker:
-      - image: cimg/base:stable
-    steps:
-      - add_ssh_keys:
-          fingerprints:
-            - $SSH_FINGERPRINT
-      - run:
-          name: Deploy to AWS EC2 Instance
-          command: |
-            ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa $EC2_USERNAME@$EC2_IP "
-              cd /var/www/vhosts/laravel-react-menu/
-              sudo git pull origin main
-              composer install --no-interaction --prefer-dist --optimize-autoloader
-              sudo php artisan migrate --force
-              sudo php artisan cache:clear
-              sudo php artisan config:cache
-            "
 
 workflows:
   build-and-test:
