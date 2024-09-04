@@ -115,5 +115,3 @@ You can access the application at the following IP address:
 - **Login Page:** [http://16.171.230.177/login](http://16.171.230.177/login)
 
 ---
-
-Feel free to modify this README to better fit your project's specifics or to add any additional instructions.
