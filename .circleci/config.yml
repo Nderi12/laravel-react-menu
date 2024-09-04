@@ -48,6 +48,19 @@ jobs:
             sed -i 's/DB_USERNAME=root/DB_USERNAME=root/' .env
             sed -i 's/DB_PASSWORD=/DB_PASSWORD=root/' .env
       - run:
+          name: Wait for MySQL
+          command: |
+            for i in `seq 1 30`; do
+              nc -z 127.0.0.1 3306 && echo Success && exit 0
+              echo -n .
+              sleep 1
+            done
+            echo Failed waiting for MySQL && exit 1
+      - run:
+          name: Debug MySQL Connection
+          command: |
+            mysql -u root -proot -e "SHOW DATABASES;" -h 127.0.0.1
+      - run:
           name: Migrate the database
           command: php artisan migrate
       - run:
@@ -72,6 +85,12 @@ jobs:
               sudo php artisan migrate --force
               sudo php artisan cache:clear
               sudo php artisan config:cache
+              cd /var/www/vhosts/laravel-react-menu/react
+              sudo npm install
+              sudo npm run build
+              sudo rm -rf node_modules
+              sudo systemctl restart php8.2-fpm
+              sudo systemctl restart nginx
             "
 
 workflows:
