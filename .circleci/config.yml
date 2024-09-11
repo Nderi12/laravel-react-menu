@@ -32,8 +32,8 @@ jobs:
   cypress-test:
     docker:
       - image: cypress/base:16
-        ports:
-          - "5173:5173"  # Expose the correct port
+    ports:
+      - "5173:5173"
     steps:
       - checkout
       - run:
