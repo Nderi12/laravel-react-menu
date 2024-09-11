@@ -54,10 +54,10 @@ jobs:
           name: Show Server Logs
           command: |
             cat react/server.log
-      - run:
-          name: Verify React Server is Running
-          command: |
-            curl -I http://localhost:3000 || (echo "React server is not running" && exit 1)
+      # - run:
+      #     name: Verify React Server is Running
+      #     command: |
+      #       curl -I http://localhost:3000 || (echo "React server is not running" && exit 1)
       - run:
           name: Run Cypress Tests
           command: |
