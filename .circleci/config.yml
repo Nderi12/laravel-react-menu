@@ -107,7 +107,9 @@ workflows:
   build-and-test:
     jobs:
       - build-node
-      - cypress-test
+      - cypress-test:
+          requires:
+            - build-node
       - test-php:
           requires:
             - build-node
