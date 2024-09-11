@@ -110,17 +110,17 @@ jobs:
 workflows:
   build-and-test:
     jobs:
-      # - build-node
-      - cypress-test
-          # requires:
-          #   - build-node
-      # - test-php:
-      #     requires:
-      #       - build-node
-      # - deploy:
-      #     requires:
-      #       - cypress-test
-      #       - test-php
-      #     filters:
-      #       branches:
-      #         only: main
+      - build-node
+      - cypress-test:
+          requires:
+            - build-node
+      - test-php:
+          requires:
+            - build-node
+      - deploy:
+          requires:
+            - cypress-test
+            - test-php
+          filters:
+            branches:
+              only: main
