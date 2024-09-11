@@ -44,21 +44,20 @@ jobs:
           command: 
             cd react && npm install --save-dev wait-on cypress --legacy-peer-deps
       - run:
-          name: Start React development server
+          name: Start React Development Server
           command: |
             cd react
-            npm run dev &
+            npm run dev -- --port 3000 &
+            sleep 5
       - run:
-          name: Wait for React server to start
+          name: Verify React Server is Running
           command: |
-            sleep 5 # Wait for the dev server to start
-            export REACT_PORT=$(lsof -i -P -n | grep LISTEN | grep node | awk '{print $9}' | cut -d: -f2)
-            npx wait-on http://localhost:$REACT_PORT
+            curl -I http://localhost:3000 || (echo "React server is not running" && exit 1)
       - run:
-          name: Run Cypress tests
+          name: Run Cypress Tests
           command: |
             cd react
-            CYPRESS_BASE_URL=http://localhost:$REACT_PORT npx cypress run
+            CYPRESS_BASE_URL=http://localhost:3000 npx cypress run
 
 
   test-php:
