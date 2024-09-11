@@ -16,6 +16,7 @@ jobs:
           name: Install npm dependencies
           command: npm install --legacy-peer-deps
       - run:
+          name: Build the React app
           command: npm run build
       - run:
           name: Create the ~/artifacts directory if it doesn't exist
@@ -37,7 +38,7 @@ jobs:
           name: Navigate to React folder
           command: cd react
       - run:
-          name: Install dependencies
+          name: Install Cypress dependencies
           command: npm install
       - run:
           name: Run Cypress tests
@@ -73,7 +74,7 @@ jobs:
           command: |
             for i in `seq 1 30`; do
               nc -z 127.0.0.1 3306 && echo Success && exit 0
-              echo -n .
+              echo -n . 
               sleep 1
             done
             echo Failed waiting for MySQL && exit 1
@@ -87,7 +88,6 @@ jobs:
       - run:
           name: Run PHP tests
           command: ./vendor/bin/phpunit
-
 
   deploy:
     # Deploy job to aws ec2 instance
