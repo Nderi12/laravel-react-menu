@@ -115,6 +115,7 @@ workflows:
             - build-node
       - deploy:
           requires:
+            - cypress-test
             - test-php
           filters:
             branches:
