@@ -42,8 +42,7 @@ jobs:
       - run:
           name: Install Cypress dependencies
           command: 
-            cd react
-            npm install --save-dev wait-on cypress --legacy-peer-deps
+            cd react && npm install --save-dev wait-on cypress --legacy-peer-deps
       - run:
           name: Start React development server
           command: |
