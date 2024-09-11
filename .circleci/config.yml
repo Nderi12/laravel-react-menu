@@ -40,16 +40,19 @@ jobs:
       - run:
           name: Start React development server
           command: |
-            cd react && PORT=5173 npm run dev &
+            cd react
+            npm run dev &
       - run:
           name: Wait for React server to start
           command: |
-            npx wait-on http://localhost:5173
+            sleep 5 # Wait for the dev server to start
+            export REACT_PORT=$(lsof -i -P -n | grep LISTEN | grep node | awk '{print $9}' | cut -d: -f2)
+            npx wait-on http://localhost:$REACT_PORT
       - run:
           name: Run Cypress tests
           command: |
-            cd react && CYPRESS_BASE_URL=http://localhost:5173 npx cypress run
-
+            cd react
+            CYPRESS_BASE_URL=http://localhost:$REACT_PORT npx cypress run
 
 
   test-php:
