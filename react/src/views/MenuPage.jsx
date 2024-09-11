@@ -104,12 +104,14 @@ const MenuPage = () => {
               <button
                 className="bg-slate-800 text-white text-sm px-4 py-2 rounded-full"
                 onClick={() => handleExpandCollapseAll(true)}
+                data-cy="expand-all-button"
               >
                 Expand All
               </button>
               <button
                 className="bg-slate-800 text-white text-sm px-4 py-2 rounded-full"
                 onClick={() => handleExpandCollapseAll(false)}
+                data-cy="collapse-all-button"
               >
                 Collapse All
               </button>

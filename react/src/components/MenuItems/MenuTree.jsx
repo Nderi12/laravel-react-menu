@@ -27,7 +27,7 @@ const MenuTree = ({ menuData, isExpanded, onSelectMenu, onAddChild }) => {
   return (
     <div className="relative">
       {menuData.map((item) => (
-        <div key={item.id} className="ml-4 relative">
+        <div key={item.id} className="ml-4 relative" data-cy="individual-menu-item">
           {/* Toggle button and item name */}
           <div className="flex items-center cursor-pointer py-1 relative">
             {/* Vertical line for child connections */}
@@ -67,7 +67,7 @@ const MenuTree = ({ menuData, isExpanded, onSelectMenu, onAddChild }) => {
               className="ml-2 text-blue-500 hover:text-blue-700"
               onClick={() => onAddChild(item)}
             >
-              <PlusCircleIcon className="h-8 w-8 rounded-full" />
+              <PlusCircleIcon className="h-8 w-8 rounded-full" data-cy="add-menu-item" />
             </button>
           </div>
 

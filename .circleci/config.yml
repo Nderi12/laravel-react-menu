@@ -25,6 +25,18 @@ jobs:
           path: ~/artifacts
           destination: node-build
 
+  cypress-test:
+    docker:
+      - image: cypress/base:16  # Use the official Cypress base image
+    steps:
+      - checkout
+      - run:
+          name: Install dependencies
+          command: npm install
+      - run:
+          name: Run Cypress tests
+          command: npx cypress run
+
   test-php:
     docker:
       - image: cimg/php:8.2-node

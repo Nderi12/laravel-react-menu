@@ -72,6 +72,7 @@ const MenuDetails = ({ selectedMenu, onUpdateMenu, onDeleteMenu }) => {
               type="text"
               className="w-full p-2 border border-gray-300 rounded"
               value={menuData.uuid || ""}
+              data-cy="menu-id-input"
               readOnly
             />
           </div>
@@ -88,6 +89,7 @@ const MenuDetails = ({ selectedMenu, onUpdateMenu, onDeleteMenu }) => {
               type="text"
               className="w-full p-2 border border-gray-300 rounded"
               value={menuData.order || "0"}
+              data-cy="menu-depth-input"
               readOnly
             />
           </div>
@@ -101,10 +103,11 @@ const MenuDetails = ({ selectedMenu, onUpdateMenu, onDeleteMenu }) => {
             </label>
             <input
               name="parent_id"
-              type="text"
+            type="text"
               className="w-full p-2 border border-gray-300 rounded"
               value={menuData.parent_id || ""}
               onChange={handleChange}
+              data-cy="menu-parent-id-input"
             />
           </div>
         )}
@@ -120,6 +123,7 @@ const MenuDetails = ({ selectedMenu, onUpdateMenu, onDeleteMenu }) => {
               type="text"
               className="w-full p-2 border border-gray-300 rounded"
               value={menuData.parent ? menuData.parent.name : "No Parent"}
+              data-cy="menu-name-input"
               onChange={handleChange}
             />
           </div>
@@ -136,6 +140,7 @@ const MenuDetails = ({ selectedMenu, onUpdateMenu, onDeleteMenu }) => {
             className="w-full p-2 border border-gray-300 rounded"
             value={menuData.name || ""}
             onChange={handleChange}
+            data-cy="menu-name-input"
           />
         </div>
 
@@ -148,6 +153,7 @@ const MenuDetails = ({ selectedMenu, onUpdateMenu, onDeleteMenu }) => {
             }`}
             onClick={handleSave}
             disabled={isSaving} // Disable button while saving
+            data-cy="save-menu-button"
           >
             {isSaving ? "Saving..." : "Save"}
           </button>
@@ -156,6 +162,7 @@ const MenuDetails = ({ selectedMenu, onUpdateMenu, onDeleteMenu }) => {
               type="submit"
               className="bg-red-500 text-white px-4 py-2 rounded"
               onClick={handleDelete}
+              data-cy="delete-menu-button"
             >
               Delete
             </button>
