@@ -35,12 +35,17 @@ jobs:
     steps:
       - checkout
       - run:
+          name: Navigate to React folder
+          command: cd react
+      - run:
           name: Install Cypress dependencies
-          command: cd react && npm install
+          command: npm install
+      - run:
+          name: List node_modules
+          command: ls -la node_modules
       - run:
           name: Run Cypress tests
-          command: cd react && npx cypress run
-
+          command: npx cypress run
 
   test-php:
     docker:
