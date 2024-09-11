@@ -10,6 +10,9 @@ jobs:
     steps:
       - checkout
       - run:
+          name: Navigate to React folder
+          command: cd react
+      - run:
           name: Install npm dependencies
           command: npm install --legacy-peer-deps
       - run:
@@ -30,6 +33,9 @@ jobs:
       - image: cypress/base:16  # Use the official Cypress base image
     steps:
       - checkout
+      - run:
+          name: Navigate to React folder
+          command: cd react
       - run:
           name: Install dependencies
           command: npm install
