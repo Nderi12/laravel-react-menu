@@ -32,6 +32,8 @@ jobs:
   cypress-test:
     docker:
       - image: cypress/base:16
+        ports:
+          - "5173:5173"  # Expose the correct port
     steps:
       - checkout
       - run:
@@ -48,7 +50,7 @@ jobs:
           name: Start React Development Server
           command: |
             cd react
-            PORT=3000 npm run dev > server.log 2>&1 &
+            npm run dev > server.log 2>&1 &
             sleep 10
       - run:
           name: Show Server Logs
@@ -57,16 +59,17 @@ jobs:
       - run:
           name: Check Listening Ports
           command: |
-            lsof -i :3000 || (echo "Port 3000 is not being used" && exit 1)
+            lsof -i :5173 || (echo "Port 5173 is not being used" && exit 1)
       - run:
           name: Verify React Server is Running
           command: |
-            curl -I http://localhost:3000 || (echo "React server is not running" && exit 1)
+            curl -I http://localhost:5173 || (echo "React server is not running" && exit 1)
       - run:
           name: Run Cypress Tests
           command: |
             cd react
-            CYPRESS_BASE_URL=http://localhost:3000 npx cypress run
+            CYPRESS_BASE_URL=http://localhost:5173 npx cypress run
+
 
 
 
