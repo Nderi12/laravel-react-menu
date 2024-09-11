@@ -44,6 +44,9 @@ jobs:
           name: List node_modules
           command: ls -la node_modules
       - run:
+          name: Install Cypress
+          command: npm install cypress --save-dev
+      - run:
           name: Run Cypress tests
           command: npx cypress run
 
