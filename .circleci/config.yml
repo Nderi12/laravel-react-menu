@@ -36,10 +36,13 @@ jobs:
       - checkout
       - run:
           name: Navigate to React folder
-          command: cd /root/project/react
+          command: cd react
       - run:
           name: Install Cypress dependencies
           command: npm install
+      - run:
+          name: List node_modules
+          command: ls -la node_modules
       - run:
           name: Run Cypress tests
           command: npx cypress run
