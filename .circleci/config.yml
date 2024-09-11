@@ -41,12 +41,13 @@ jobs:
             apt-get install -y lsof # Install lsof
       - run:
           name: Install Cypress dependencies
-          command: cd react && npm install
+          command: 
+            cd react
+            npm install --save-dev wait-on cypress --legacy-peer-deps
       - run:
           name: Start React development server
           command: |
             cd react
-            npm install --save-dev wait-on
             npm run dev &
       - run:
           name: Wait for React server to start
