@@ -38,8 +38,18 @@ jobs:
           name: Install Cypress dependencies
           command: cd react && npm install
       - run:
+          name: Start React development server
+          command: |
+            cd react && PORT=5173 npm run dev &
+      - run:
+          name: Wait for React server to start
+          command: |
+            npx wait-on http://localhost:5173
+      - run:
           name: Run Cypress tests
-          command: cd react && npx cypress run
+          command: |
+            cd react && CYPRESS_BASE_URL=http://localhost:5173 npx cypress run
+
 
 
   test-php:
