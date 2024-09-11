@@ -110,7 +110,7 @@ jobs:
 workflows:
   build-and-test:
     jobs:
-      # - build-node
+      - build-node
       - cypress-test:
           requires:
             - build-node
