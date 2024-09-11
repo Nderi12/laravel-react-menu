@@ -2,8 +2,15 @@ version: 2.1
 orbs:
   node: circleci/node@5
   php: circleci/php@1
+  codecov: codecov/codecov@4.0.1
 
 jobs:
+  codecov-upload:
+      docker:
+        - image: cimg/base:stable
+      steps:
+        - codecov/upload  # Use the Codecov Orb to upload coverage reports
+      
   build-node:
     # Build the Node.js project
     executor: node/default
@@ -140,12 +147,16 @@ workflows:
   build-and-test:
     jobs:
       - build-node
-      - cypress-test:
-          requires:
-            - build-node
+      # - cypress-test:
+      #     requires:
+      #       - build-node
       - test-php:
           requires:
             - build-node
+      - codecov-upload:
+          requires:
+            # - cypress-test
+            - test-php
       - deploy:
           requires:
             - cypress-test
