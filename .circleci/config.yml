@@ -88,19 +88,13 @@ jobs:
           name: Run PHP tests
           command: ./vendor/bin/phpunit
 
-  cypress-install:
-    docker:
-      - image: cimg/node:20.12.2
+  cypress-run:
+    executor: with-chrome
     steps:
       - checkout
       - run:
           name: Install Cypress dependencies
           command: cd react && npm install
-
-  cypress-run:
-    executor: with-chrome
-    steps:
-      - checkout
       - run:
           name: Run Cypress tests
           command: cd react && npx cypress run
