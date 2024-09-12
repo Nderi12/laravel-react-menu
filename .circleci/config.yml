@@ -96,10 +96,6 @@ jobs:
           name: Install Cypress dependencies
           command: cd react && npm install
       - run:
-          name: Show Server Logs
-          command: |
-            cat react/server.log
-      - run:
           name: Run Cypress tests
           command: cd react && npx cypress run
       - store_test_results:
