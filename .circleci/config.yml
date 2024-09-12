@@ -127,9 +127,7 @@ workflows:
   build-and-test:
     jobs:
       - build-node
-      - cypress-run:
-          requires:
-            - cypress-install
+      - cypress-run
       - test-php:
           requires:
             - build-node
