@@ -25,7 +25,7 @@ jobs:
       - run:
           name: Start React server
           command: |
-            cd react
+            cd react && npm install
             npm run dev & # Start server in the background
             # Wait for the server to be up and running
             for i in `seq 1 30`; do
