@@ -147,16 +147,16 @@ workflows:
   build-and-test:
     jobs:
       - build-node
-      # - cypress-test:
-      #     requires:
-      #       - build-node
+      - cypress-test:
+          requires:
+            - build-node
       - test-php:
           requires:
             - build-node
-      - codecov-upload:
-          requires:
+      # - codecov-upload:
+      #     requires:
             # - cypress-test
-            - test-php
+            # - test-php
       - deploy:
           requires:
             # - cypress-test
