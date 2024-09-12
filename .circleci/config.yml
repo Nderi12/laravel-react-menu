@@ -2,8 +2,8 @@ version: 2.1
 orbs:
   node: circleci/node@5
   php: circleci/php@1
-  cypress: cypress-io/cypress@1
   codecov: codecov/codecov@4.0.1
+  cypress: cypress-io/cypress@1
 
 executors:
   with-chrome:
@@ -42,35 +42,6 @@ jobs:
       - store_artifacts:
           path: ~/artifacts
           destination: node-build
-
-  cypress-test:
-    executor: with-chrome
-    steps:
-      - checkout
-      - run:
-          name: Install Cypress dependencies
-          command: |
-            cd react
-            npm install --legacy-peer-deps
-      - run:
-          name: Start React development server
-          command: |
-            cd react
-            npm run dev &
-      - run:
-          name: Wait for React server to start
-          command: |
-            cd react
-            npx wait-on http://localhost:5173
-      - run:
-          name: Run Cypress tests
-          command: |
-            cd react
-            CYPRESS_BASE_URL=http://localhost:5173 npx cypress run
-      - store_test_results:
-          path: react/cypress/results
-      - store_artifacts:
-          path: react/cypress/screenshots
 
   test-php:
     docker:
@@ -117,6 +88,27 @@ jobs:
           name: Run PHP tests
           command: ./vendor/bin/phpunit
 
+  cypress-install:
+    docker:
+      - image: cimg/node:20.12.2
+    steps:
+      - checkout
+      - run:
+          name: Install Cypress dependencies
+          command: npm install
+
+  cypress-run:
+    executor: with-chrome
+    steps:
+      - checkout
+      - run:
+          name: Run Cypress tests
+          command: npx cypress run
+      - store_test_results:
+          path: cypress/results
+      - store_artifacts:
+          path: cypress/screenshots
+
   deploy:
     # Deploy job to aws ec2 instance
     docker:
@@ -141,19 +133,20 @@ workflows:
   build-and-test:
     jobs:
       - build-node
-      - cypress-test:
+      - cypress-install:
           requires:
             - build-node
+      - cypress-run:
+          requires:
+            - cypress-install
       - test-php:
           requires:
             - build-node
-      # - codecov-upload:
-      #     requires:
-            # - cypress-test
-            # - test-php
+      - codecov-upload:
+          requires:
+            - test-php
       # - deploy:
       #     requires:
-      #       - cypress-test
       #       - test-php
       #     filters:
       #       branches:
