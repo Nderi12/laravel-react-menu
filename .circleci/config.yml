@@ -138,12 +138,12 @@ workflows:
   build-and-test:
     jobs:
       - build-node
-      - cypress-install:
-          requires:
-            - build-node
-      - cypress-run:
-          requires:
-            - cypress-install
+      # - cypress-install:
+      #     requires:
+      #       - build-node
+      - cypress-run
+          # requires:
+          #   - cypress-install
       - test-php:
           requires:
             - build-node
