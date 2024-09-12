@@ -95,7 +95,9 @@ jobs:
       - checkout
       - run:
           name: Install Cypress dependencies
-          command: npm install
+          command: 
+            cd react
+            npm install
 
   cypress-run:
     executor: with-chrome
@@ -103,7 +105,9 @@ jobs:
       - checkout
       - run:
           name: Run Cypress tests
-          command: npx cypress run
+          command: 
+            cd react
+            npx cypress run
       - store_test_results:
           path: cypress/results
       - store_artifacts:
