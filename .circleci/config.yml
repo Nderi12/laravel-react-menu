@@ -18,6 +18,22 @@ jobs:
           name: Install Node.js dependencies
           command: cd react && npm install
 
+  # cypress-start:
+  #   executor: with-chrome
+  #   steps:
+  #     - checkout
+  #     - run:
+  #         name: Start React server
+  #         command: |
+  #           cd react && npm install
+  #           npm run dev & # Start server in the background
+  #           # Wait for the server to be up and running
+  #           for i in `seq 1 30`; do
+  #             curl -sSf http://localhost:3000 && echo "Server is up" && exit 0
+  #             echo -n .
+  #             sleep 1
+  #           done
+  #           echo "Failed to start server" && exit 1
   cypress-start:
     executor: with-chrome
     steps:
@@ -25,15 +41,29 @@ jobs:
       - run:
           name: Start React server
           command: |
-            cd react && npm install
-            npm run dev & # Start server in the background
-            # Wait for the server to be up and running
+            cd react
+            # Start the server in the background and capture the output
+            npm run dev > server.log 2>&1 &
+            SERVER_PID=$!
+            # Wait for the server to start and extract the port number
             for i in `seq 1 30`; do
-              curl -sSf http://localhost:3000 && echo "Server is up" && exit 0
+              PORT=$(grep -oP 'Local: http://localhost:\K[0-9]+' server.log)
+              if [ -n "$PORT" ]; then
+                echo "Server is running on port $PORT"
+                curl -sSf http://localhost:$PORT && echo "Server is up" && exit 0
+              fi
               echo -n .
               sleep 1
             done
             echo "Failed to start server" && exit 1
+      - run:
+          name: Run Cypress tests
+          command: cd react && npx cypress run
+      - store_test_results:
+          path: react/cypress/results
+      - store_artifacts:
+          path: react/cypress/screenshots
+
 
   cypress-run:
     executor: with-chrome
