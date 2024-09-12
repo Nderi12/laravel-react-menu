@@ -1,8 +1,5 @@
 version: 2.1
 orbs:
-  node: circleci/node@5
-  php: circleci/php@1
-  codecov: codecov/codecov@4.0.1
   cypress: cypress-io/cypress@1
 
 executors:
@@ -12,134 +9,51 @@ executors:
       - image: "cypress/browsers:node14.16.0-chrome90-ff88"
 
 jobs:
-  codecov-upload:
-      docker:
-        - image: cimg/base:stable
-      steps:
-        - codecov/upload  # Use the Codecov Orb to upload coverage reports
-      
-  build-node:
-    # Build the Node.js project
-    executor: node/default
-    steps:
-      - checkout
-      - run:
-          name: Navigate to React folder
-          command: cd react
-      - run:
-          name: Install npm dependencies
-          command: npm install --legacy-peer-deps
-      - run:
-          name: Build the React app
-          command: npm run build
-      - run:
-          name: Create the ~/artifacts directory if it doesn't exist
-          command: mkdir -p ~/artifacts
-      # Copy output to artifacts directory
-      - run:
-          name: Copy artifacts
-          command: cp -R build dist public .output .next .docusaurus ~/artifacts 2>/dev/null || true
-      - store_artifacts:
-          path: ~/artifacts
-          destination: node-build
-
-  test-php:
+  cypress-install:
     docker:
-      - image: cimg/php:8.2-node
-      - image: circleci/mysql:5.7   # Add MySQL service
-        environment:
-          MYSQL_ROOT_PASSWORD: root
-          MYSQL_DATABASE: laravel  # Set the name of your test database
+      - image: cimg/node:14.17.0
     steps:
       - checkout
       - run:
-          name: Install MySQL Client
-          command: sudo apt-get update && sudo apt-get install -y mysql-client
+          name: Install Node.js dependencies
+          command: cd react && npm install
+
+  cypress-start:
+    executor: with-chrome
+    steps:
+      - checkout
       - run:
-          name: Install composer dependencies
-          command: composer install --no-interaction --prefer-dist --no-scripts --no-progress --no-suggest
-      - run:
-          name: Set up Laravel environment
+          name: Start React server
           command: |
-            cp .env.example .env
-            php artisan key:generate
-            # Update .env with database connection details
-            sed -i 's/DB_HOST=127.0.0.1/DB_HOST=127.0.0.1/' .env
-            sed -i 's/DB_DATABASE=laravel/DB_DATABASE=laravel/' .env
-            sed -i 's/DB_USERNAME=root/DB_USERNAME=root/' .env
-            sed -i 's/DB_PASSWORD=/DB_PASSWORD=root/' .env
-      - run:
-          name: Wait for MySQL
-          command: |
+            cd react
+            npm start & # Start server in the background
+            # Wait for the server to be up and running
             for i in `seq 1 30`; do
-              nc -z 127.0.0.1 3306 && echo Success && exit 0
-              echo -n . 
+              curl -sSf http://localhost:5173 && echo "Server is up" && exit 0
+              echo -n .
               sleep 1
             done
-            echo Failed waiting for MySQL && exit 1
-      - run:
-          name: Debug MySQL Connection
-          command: |
-            mysql -u root -proot -e "SHOW DATABASES;" -h 127.0.0.1
-      - run:
-          name: Migrate the database
-          command: php artisan migrate
-      - run:
-          name: Run PHP tests
-          command: ./vendor/bin/phpunit
+            echo "Failed to start server" && exit 1
 
   cypress-run:
     executor: with-chrome
     steps:
       - checkout
       - run:
-          name: Install Cypress dependencies
-          command: cd react && npm install
-      - run:
-          name: Run React Server
-          command: cd react && npm run dev --save-dev
-      - run:
           name: Run Cypress tests
           command: cd react && npx cypress run
       - store_test_results:
-          path: cypress/results
+          path: react/cypress/results
       - store_artifacts:
-          path: cypress/screenshots
-
-  deploy:
-    # Deploy job to aws ec2 instance
-    docker:
-      - image: cimg/base:stable
-    steps:
-      - add_ssh_keys:
-          fingerprints:
-            - $SSH_FINGERPRINT
-      - run:
-          name: Deploy to AWS EC2 Instance
-          command: |
-            ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa $EC2_USERNAME@$EC2_IP "
-              cd /var/www/vhosts/laravel-react-menu/
-              git pull origin main
-              composer install --no-interaction --prefer-dist --optimize-autoloader
-              sudo php artisan migrate --force
-              sudo php artisan cache:clear
-              sudo php artisan config:cache
-            "
+          path: react/cypress/screenshots
 
 workflows:
-  build-and-test:
+  test:
     jobs:
-      - build-node
-      - cypress-run
-      - test-php:
+      - cypress-install
+      - cypress-start:
           requires:
-            - build-node
-      - codecov-upload:
+            - cypress-install
+      - cypress-run:
           requires:
-            - test-php
-      # - deploy:
-      #     requires:
-      #       - test-php
-      #     filters:
-      #       branches:
-      #         only: main
+            - cypress-start
