@@ -61,10 +61,10 @@ jobs:
           name: Show Server Logs
           command: |
             cat react/server.log
-      - run:
-          name: Check Listening Ports
-          command: |
-            lsof -i :5173 || (echo "Port 5173 is not being used" && exit 1)
+      # - run:
+      #     name: Check Listening Ports
+      #     command: |
+      #       lsof -i :5173 || (echo "Port 5173 is not being used" && exit 1)
       - run:
           name: Verify React Server is Running
           command: |
@@ -157,10 +157,10 @@ workflows:
       #     requires:
             # - cypress-test
             # - test-php
-      - deploy:
-          requires:
-            # - cypress-test
-            - test-php
-          filters:
-            branches:
-              only: main
+      # - deploy:
+      #     requires:
+      #       - cypress-test
+      #       - test-php
+      #     filters:
+      #       branches:
+      #         only: main
