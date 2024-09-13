@@ -162,9 +162,9 @@ workflows:
       - test-php:
           requires:
             - build-node
-      - codecov-upload:
-          requires:
-            - test-php
+      # - codecov-upload:
+      #     requires:
+      #       - test-php
       # - deploy:
       #     requires:
       #       - test-php
