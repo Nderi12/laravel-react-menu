@@ -89,7 +89,7 @@ jobs:
           command: ./vendor/bin/phpunit
       - codecov/upload:
           file: coverage.xml
-          token: $CODECOV_TOKEN
+          token: CODECOV_TOKEN
 
   # cypress-install:
   #   docker:
