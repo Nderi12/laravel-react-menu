@@ -2,8 +2,7 @@
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
          bootstrap="vendor/autoload.php"
-         colors="true"
->
+         colors="true">
     <testsuites>
         <testsuite name="Unit">
             <directory>tests/Unit</directory>
@@ -12,11 +11,21 @@
             <directory>tests/Feature</directory>
         </testsuite>
     </testsuites>
-    <source>
+    <coverage>
         <include>
             <directory>app</directory>
         </include>
-    </source>
+        <exclude>
+            <directory>app/Console</directory>
+            <directory>app/Exceptions</directory>
+            <directory>app/Http/Controllers</directory>
+            <directory>app/Http/Middleware</directory>
+            <directory>app/Providers</directory>
+        </exclude>
+        <report>
+            <clover outputFile="coverage.xml"/>
+        </report>
+    </coverage>
     <php>
         <env name="APP_ENV" value="testing"/>
         <env name="BCRYPT_ROUNDS" value="4"/>
@@ -29,7 +38,4 @@
         <env name="SESSION_DRIVER" value="array"/>
         <env name="TELESCOPE_ENABLED" value="false"/>
     </php>
-    <logging>
-        <log type="coverage-xml" target="coverage/coverage.xml" />
-    </logging>
 </phpunit>
