@@ -1,0 +1,15 @@
+# codecov.yml
+comment:
+  layout: "reach,diff,flags,files,footer"
+  behavior: default
+coverage:
+  precision: 2
+  round: down
+  range: "70...100"
+parsers:
+  gcov:
+    branch_detection:
+      conditional: yes
+      loop: yes
+      method: yes
+      macro: no

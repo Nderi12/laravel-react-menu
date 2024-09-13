@@ -86,9 +86,11 @@ jobs:
           command: php artisan migrate
       - run:
           name: Run PHP tests
-          command: ./vendor/bin/phpunit
+          command: ./vendor/bin/phpunit --coverage-xml coverage
+      - store_artifacts:
+          path: coverage
       - codecov/upload:
-          file: coverage.xml
+          file: coverage/coverage.xml
           token: CODECOV_TOKEN
 
   # cypress-install:
