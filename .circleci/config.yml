@@ -86,7 +86,7 @@ jobs:
           command: php artisan migrate
       - run:
           name: Run PHP tests
-          command: ./vendor/bin/phpunit --coverage-xml coverage
+          command: ./vendor/bin/phpunit --coverage-clover=coverage.xml
       - store_artifacts:
           path: coverage
       - codecov/upload:
