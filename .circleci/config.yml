@@ -58,13 +58,6 @@ jobs:
       - run:
           name: Install composer dependencies
           command: composer install --no-interaction --prefer-dist --no-scripts --no-progress --no-suggest
-      # - run:
-      #     name: Install Xdebug
-      #     command: sudo apt-get install -y php-xdebug
-      # - run:
-      #     name: Configure Xdebug for coverage
-      #     command: |
-      #       echo "xdebug.mode=coverage" | sudo tee /usr/local/etc/php/conf.d/xdebug-custom.ini
       - run:
           name: Set up Laravel environment
           command: |
@@ -92,15 +85,11 @@ jobs:
           name: Migrate the database
           command: php artisan migrate
       - run:
-          name: Set XDEBUG_MODE environment variable
-          command: |
-            export XDEBUG_MODE=coverage
-            ./vendor/bin/phpunit --coverage-clover=coverage.xml
-      - store_artifacts:
-          path: coverage
-      - codecov/upload:
-          file: coverage/coverage.xml
-          token: CODECOV_TOKEN
+          name: Run PHP tests
+          command: ./vendor/bin/phpunit --coverage-xml coverage
+      # - codecov/upload:
+      #     file: coverage.xml
+      #     token: CODECOV_TOKEN
 
   # cypress-install:
   #   docker:
