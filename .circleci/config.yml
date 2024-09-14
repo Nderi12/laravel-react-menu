@@ -63,7 +63,7 @@ jobs:
           command: sudo apt-get install -y php-xdebug
       - run:
           name: Enable Xdebug
-          command: echo "zend_extension=xdebug.so" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+          command: sudo echo "zend_extension=xdebug.so" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
       - run:
           name: Set up Laravel environment
           command: |
