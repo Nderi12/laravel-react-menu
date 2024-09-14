@@ -59,6 +59,12 @@ jobs:
           name: Install composer dependencies
           command: composer install --no-interaction --prefer-dist --no-scripts --no-progress --no-suggest
       - run:
+          name: Install Xdebug
+          command: sudo apt-get install -y php-xdebug
+      - run:
+          name: Enable Xdebug
+          command: echo "zend_extension=xdebug.so" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+      - run:
           name: Set up Laravel environment
           command: |
             cp .env.example .env
