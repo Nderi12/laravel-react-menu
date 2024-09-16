@@ -69,6 +69,12 @@ jobs:
             sed -i 's/DB_USERNAME=root/DB_USERNAME=root/' .env
             sed -i 's/DB_PASSWORD=/DB_PASSWORD=root/' .env
       - run:
+          name: Install Xdebug for Code Coverage
+          command: |
+            sudo apt-get update && sudo apt-get install -y php-xdebug
+            echo 'zend_extension=xdebug.so' >> ~/.phpenv/versions/$(phpenv global)/etc/php.ini
+            echo 'xdebug.mode=coverage' >> ~/.phpenv/versions/$(phpenv global)/etc/php.ini
+      - run:
           name: Wait for MySQL
           command: |
             for i in `seq 1 30`; do
