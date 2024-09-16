@@ -11,13 +11,7 @@ executors:
     docker:
       - image: "cypress/browsers:node14.16.0-chrome90-ff88"
 
-jobs:
-  # codecov-upload:
-  #     docker:
-  #       - image: cimg/base:stable
-  #     steps:
-  #       - codecov/upload  # Use the Codecov Orb to upload coverage reports
-      
+jobs:      
   build-node:
     # Build the Node.js project
     executor: node/default
@@ -69,12 +63,6 @@ jobs:
             sed -i 's/DB_USERNAME=root/DB_USERNAME=root/' .env
             sed -i 's/DB_PASSWORD=/DB_PASSWORD=root/' .env
       - run:
-          name: Install Xdebug for Code Coverage
-          command: |
-            sudo apt-get update && sudo apt-get install -y php-xdebug
-            # Add Xdebug config to PHP CLI
-            echo 'xdebug.mode=coverage' | sudo tee -a /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
-      - run:
           name: Wait for MySQL
           command: |
             for i in `seq 1 30`; do
@@ -92,19 +80,7 @@ jobs:
           command: php artisan migrate
       - run:
           name: Run PHP tests
-          command: ./vendor/bin/phpunit --coverage-xml coverage
-      - codecov/upload:
-          file: coverage.xml
-          token: CODECOV_TOKEN
-
-  # cypress-install:
-  #   docker:
-  #     - image: cimg/node:20.12.2
-  #   steps:
-  #     - checkout
-  #     - run:
-  #         name: Install Cypress dependencies
-  #         command: cd react && npm install
+          command: ./vendor/bin/phpunit
 
   cypress-run:
     executor: with-chrome
@@ -159,15 +135,8 @@ workflows:
   build-and-test:
     jobs:
       - build-node
-      # - cypress-install:
-      #     requires:
-      #       - build-node
-      # - cypress-run
-          # requires:
-          #   - cypress-install
-      - test-php:
-          requires:
-            - build-node
+      - cypress-run
+      - test-php
       # - codecov-upload:
       #     requires:
       #       - test-php
