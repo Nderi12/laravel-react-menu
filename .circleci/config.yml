@@ -95,20 +95,20 @@ jobs:
       - run:
           name: Install Cypress dependencies
           command: cd react && npm install
-      # - run:
-      #     name: Start React server
-      #     command: |
-      #       cd react
-      #       # Start the server in the background
-      #       npm run dev & # This starts the server and continues to run in the background
-      #       SERVER_PID=$!
-      #       # Wait for the server to be up and running
-      #       for i in `seq 1 30`; do
-      #         curl -sSf http://localhost:3000 && echo "Server is up" && exit 0
-      #         echo -n .
-      #         sleep 1
-      #       done
-      #       echo "Failed to start server" && exit 1
+      - run:
+          name: Start React server
+          command: |
+            cd react
+            npm run dev &
+            # Store the background process ID
+            SERVER_PID=$!
+            # Wait for the server to be up and running
+            for i in `seq 1 30`; do
+              curl -sSf http://localhost:5173 && echo "Server is up" && exit 0
+              echo -n .
+              sleep 1
+            done
+            echo "Failed to start server" && kill $SERVER_PID && exit 1
       - run:
           name: Run Cypress tests
           command: cd react && npx cypress run
