@@ -87,9 +87,7 @@ jobs:
       - run:
           name: Run PHP tests
           command: ./vendor/bin/phpunit --coverage-xml coverage
-      # - codecov/upload:
-      #     file: coverage.xml
-      #     token: CODECOV_TOKEN
+      - codecov/upload
 
   # cypress-install:
   #   docker:
